@@ -1,6 +1,8 @@
-/*  makerbrains.com
-    Mukesh Sankhla
-    @mukesh.diy     */
+/*
+   Project  :  BrailleBot
+   Author   :  Mukesh Sankhla
+   Website  :  makerbrains.com
+*/
     
 #include <Servo.h>
 
