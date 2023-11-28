@@ -1,3 +1,4 @@
+
 #include <Servo.h>
 #include "Arduino.h"
 #include "DFRobotDFPlayerMini.h"
@@ -70,6 +71,19 @@ void loop() {
     clear();
     play();
     previousPressed = false;  // Reset the flag
+  }
+}
+
+void dot1Up(){
+  for (int pos = 180; pos >= 162; pos--) {
+    myservo.write(servo1, pos);  
+    delay(5);
+  }
+}
+ void dot1Down(){
+  for (int pos = 162; pos <= 180; pos++) {
+    myservo.write(servo1, pos);  
+    delay(5);
   }
 }
 
@@ -224,19 +238,6 @@ void play(){
       position = 1;
     }
   }
-
-  void dot1Up(){
-    for (int pos = 180; pos >= 162; pos--) {
-      myservo.write(servo1, pos);  
-      delay(5);
-    }
-  }
-  void dot1Down(){
-    for (int pos = 162; pos <= 180; pos++) {
-      myservo.write(servo1, pos);  
-      delay(5);
-    }
-}
 
 void clear(){
   dot1Down();
