@@ -1,3 +1,8 @@
+/*
+   Project  :  BrailleBot
+   Author   :  Mukesh Sankhla
+   Website  :  makerbrains.com
+*/
 
 #include <Servo.h>
 #include "Arduino.h"
@@ -5,20 +10,21 @@
 
 #define FPSerial Serial1
 
+// The delay of 2sec for the action to complete
 #define pause 2000
 
-const int nextPin = 45;      // Pin for the "Next" button
-const int previousPin = 8;  // Pin for the "Previous" button
+// Pin assignments for "Next" and "Previous" buttons
+const int nextPin = 45;
+const int previousPin = 8;
 
+// Flags to detect button presses
 volatile bool nextPressed = false;
 volatile bool previousPressed = false;
 
-int position = 0;
+int position = 0;  // Current Braille alphabet position
 
+// Servo motor assignments for Braille dots
 Servo myservo = Servo();
-DFRobotDFPlayerMini myDFPlayer;
-void printDetail(uint8_t type, int value);
-
 const int servo1 = 4;
 const int servo2 = 5;
 const int servo3 = 6;
@@ -30,57 +36,69 @@ void setup() {
   pinMode(nextPin, INPUT_PULLUP);
   pinMode(previousPin, INPUT_PULLUP);
 
+  // Set up serial communication
   FPSerial.begin(9600, SERIAL_8N1, /*rx =*/48, /*tx =*/46);
   Serial.begin(115200);
 
+  // Display welcome message
   Serial.println(F("Hello! I am BrailleBot."));
+
+  // Attach interrupts for button presses
   attachInterrupt(digitalPinToInterrupt(nextPin), nextISR, FALLING);
   attachInterrupt(digitalPinToInterrupt(previousPin), previousISR, FALLING);
 
+  // Initialize the DFPlayer module
   if (!myDFPlayer.begin(FPSerial, /*isACK = */true, /*doReset = */true)) {
     Serial.println(F("Unable to begin:"));
-    Serial.println(F("1.Please recheck the connection!"));
-    Serial.println(F("2.Please insert the SD card!"));
+    Serial.println(F("1. Please recheck the connection!"));
+    Serial.println(F("2. Please insert the SD card!"));
   }
 
-  Serial.println(F("Lets Start Learning."));
+  // Display start message
+  Serial.println(F("Let's Start Learning."));
 
+  // Clear Braille display and play introduction audio
   clear();
   delay(1000);
-
   myDFPlayer.volume(30);
   myDFPlayer.play(27);
   delay(4000);
 
-  for(int i = 0; i< 5; i++){
+  // Perform initial setup by moving Braille dots up and down
+  for(int i = 0; i < 5; i++){
     up();
     clear();
   }
-  play();
+  play();  // Play the audio for the current Braille letter
 }
 
+// Main loop
 void loop() {
+  // Check if "Next" button is pressed
   if (nextPressed) {
     position++;
     clear();
-    play();
+    play();  // Play the audio for the new Braille letter
     nextPressed = false;  // Reset the flag
   }
+
+  // Check if "Previous" button is pressed
   if (previousPressed) {
     position--;
     clear();
-    play();
+    play();  // Play the audio for the new Braille letter
     previousPressed = false;  // Reset the flag
   }
 }
 
+// Functions to move each Braille dot up and down
 void dot1Up(){
   for (int pos = 180; pos >= 162; pos--) {
     myservo.write(servo1, pos);  
     delay(5);
   }
 }
- void dot1Down(){
+void dot1Down(){
   for (int pos = 162; pos <= 180; pos++) {
     myservo.write(servo1, pos);  
     delay(5);
@@ -152,6 +170,8 @@ void dot6Down(){
   }
 }
 
+
+// Function to play audio and move Braille dots for each letter
 void play(){  
     if(position == 0){
       position = 1;
@@ -239,6 +259,7 @@ void play(){
     }
   }
 
+// Function to clear Braille display by moving all dots down
 void clear(){
   dot1Down();
   delay(100);
@@ -254,6 +275,7 @@ void clear(){
   delay(100);
 }
 
+// Functions for each Braille letter from A to Z
 void a(){
   dot1Up();
   myDFPlayer.play(2);
@@ -468,7 +490,7 @@ void z(){
   delay(pause);
 }
 
-
+// Function to move all Braille dots up
 void up(){
   dot1Up();
   dot2Up();
@@ -478,10 +500,12 @@ void up(){
   dot6Up();
 }
 
+// Interrupt service routine for "Next" button
 void nextISR() {
   nextPressed = true;
 }
 
+// Interrupt service routine for "Previous" button
 void previousISR() {
   previousPressed = true;
 }
