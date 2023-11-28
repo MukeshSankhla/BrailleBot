@@ -4,9 +4,15 @@
 
 #define FPSerial Serial1
 
-#define pause 5000
+#define pause 2000
 
-int position = 1;
+const int nextPin = 45;      // Pin for the "Next" button
+const int previousPin = 8;  // Pin for the "Previous" button
+
+volatile bool nextPressed = false;
+volatile bool previousPressed = false;
+
+int position = 0;
 
 Servo myservo = Servo();
 DFRobotDFPlayerMini myDFPlayer;
@@ -20,10 +26,15 @@ const int servo5 = 15;
 const int servo6 = 16;
 
 void setup() {
+  pinMode(nextPin, INPUT_PULLUP);
+  pinMode(previousPin, INPUT_PULLUP);
+
   FPSerial.begin(9600, SERIAL_8N1, /*rx =*/48, /*tx =*/46);
   Serial.begin(115200);
 
   Serial.println(F("Hello! I am BrailleBot."));
+  attachInterrupt(digitalPinToInterrupt(nextPin), nextISR, FALLING);
+  attachInterrupt(digitalPinToInterrupt(previousPin), previousISR, FALLING);
 
   if (!myDFPlayer.begin(FPSerial, /*isACK = */true, /*doReset = */true)) {
     Serial.println(F("Unable to begin:"));
@@ -44,104 +55,21 @@ void setup() {
     up();
     clear();
   }
+  play();
 }
 
 void loop() {
-  if(position == 1){
-    a();
+  if (nextPressed) {
+    position++;
+    clear();
+    play();
+    nextPressed = false;  // Reset the flag
   }
-  if(position == 2){
-    b();
-  }
-  if(position == 3){
-    c();
-  }
-  if(position == 4){
-    d();
-  }
-  if(position == 5){
-    e();
-  }
-  if(position == 6){
-    f();
-  }
-  if(position == 7){
-    g();
-  }
-  if(position == 8){
-    h();
-  }
-  if(position == 9){
-    i();
-  }
-  if(position == 10){
-    j();
-  }
-  if(position == 11){
-    k();
-  }
-  if(position == 12){
-    l();
-  }
-  if(position == 13){
-    m();
-  }
-  if(position == 14){
-    n();
-  }
-  if(position == 15){
-    o();
-  }
-  if(position == 16){
-    p();
-  }
-  if(position == 17){
-    q();
-  }
-  if(position == 18){
-    r();
-  }
-  if(position == 19){
-    s();
-  }
-  if(position == 20){
-    t();
-  }
-  if(position == 21){
-    u();
-  }
-  if(position == 22){
-    v();
-  }
-  if(position == 23){
-    w();
-  }
-  if(position == 24){
-    x();
-  }
-  if(position == 25){
-    y();
-  }
-  if(position == 26){
-    z();
-  }
-  if(position == 27){
-    position == 1;
-  }
-  position++;
-  clear();
-}
-
-void dot1Up(){
-  for (int pos = 180; pos >= 162; pos--) {
-    myservo.write(servo1, pos);  
-    delay(5);
-  }
-}
-void dot1Down(){
-  for (int pos = 162; pos <= 180; pos++) {
-    myservo.write(servo1, pos);  
-    delay(5);
+  if (previousPressed) {
+    position--;
+    clear();
+    play();
+    previousPressed = false;  // Reset the flag
   }
 }
 
@@ -208,6 +136,106 @@ void dot6Down(){
     myservo.write(servo6, pos);  
     delay(5);
   }
+}
+
+void play(){  
+    if(position == 0){
+      position = 1;
+    }
+    if(position == 1){
+      a();
+    }
+    if(position == 2){
+      b();
+    }
+    if(position == 3){
+      c();
+    }
+    if(position == 4){
+      d();
+    }
+    if(position == 5){
+      e();
+    }
+    if(position == 6){
+      f();
+    }
+    if(position == 7){
+      g();
+    }
+    if(position == 8){
+      h();
+    }
+    if(position == 9){
+      i();
+    }
+    if(position == 10){
+      j();
+    }
+    if(position == 11){
+      k();
+    }
+    if(position == 12){
+      l();
+    }
+    if(position == 13){
+      m();
+    }
+    if(position == 14){
+      n();
+    }
+    if(position == 15){
+      o();
+    }
+    if(position == 16){
+      p();
+    }
+    if(position == 17){
+      q();
+    }
+    if(position == 18){
+      r();
+    }
+    if(position == 19){
+      s();
+    }
+    if(position == 20){
+      t();
+    }
+    if(position == 21){
+      u();
+    }
+    if(position == 22){
+      v();
+    }
+    if(position == 23){
+      w();
+    }
+    if(position == 24){
+      x();
+    }
+    if(position == 25){
+      y();
+    }
+    if(position == 26){
+      z();
+    }
+    if(position == 27){
+      position = 1;
+    }
+  }
+
+  void dot1Up(){
+    for (int pos = 180; pos >= 162; pos--) {
+      myservo.write(servo1, pos);  
+      delay(5);
+    }
+  }
+  void dot1Down(){
+    for (int pos = 162; pos <= 180; pos++) {
+      myservo.write(servo1, pos);  
+      delay(5);
+    }
 }
 
 void clear(){
@@ -447,4 +475,12 @@ void up(){
   dot4Up();
   dot5Up();
   dot6Up();
+}
+
+void nextISR() {
+  nextPressed = true;
+}
+
+void previousISR() {
+  previousPressed = true;
 }
