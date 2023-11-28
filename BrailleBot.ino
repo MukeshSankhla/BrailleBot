@@ -32,6 +32,9 @@ const int servo4 = 7;
 const int servo5 = 15;
 const int servo6 = 16;
 
+// Declaration of the DFPlayer instance
+DFRobotDFPlayerMini myDFPlayer;
+
 void setup() {
   pinMode(nextPin, INPUT_PULLUP);
   pinMode(previousPin, INPUT_PULLUP);
